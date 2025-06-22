@@ -13,9 +13,7 @@ class ReplyChecker:
     """回复检查器"""
 
     def __init__(self, stream_id: str, private_name: str):
-        self.llm = LLMRequest(
-            model=global_config.llm_PFC_reply_checker, temperature=0.50, request_type="reply_check"
-        )
+        self.llm = LLMRequest(model=global_config.llm_PFC_reply_checker, temperature=0.50, request_type="reply_check")
         self.name = global_config.bot.nickname
         self.private_name = private_name
         self.chat_observer = ChatObserver.get_instance(stream_id, private_name)
