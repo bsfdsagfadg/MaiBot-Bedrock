@@ -14,7 +14,7 @@ class ReplyChecker:
 
     def __init__(self, stream_id: str, private_name: str):
         self.llm = LLMRequest(
-            model=global_config.llm_PFC_reply_checker, temperature=0.50, max_tokens=1000, request_type="reply_check"
+            model=global_config.llm_PFC_reply_checker, temperature=0.50, request_type="reply_check"
         )
         self.name = global_config.bot.nickname
         self.private_name = private_name

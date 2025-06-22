@@ -209,7 +209,6 @@ library_log_levels = { "aiohttp" = "WARNING"} # 设置特定库的日志级别
 # pri_in = <float> : 用于指定模型输入价格
 # pri_out = <float> : 用于指定模型输出价格
 # temp = <float> : 用于指定模型温度
-# enable_thinking = <true|false> : 用于指定模型是否启用思考
 # thinking_budget = <int> : 用于指定模型思考最长长度
 
 [model]
@@ -232,7 +231,6 @@ provider = "SILICONFLOW"
 pri_in = 0
 pri_out = 0
 temp = 0.7
-enable_thinking = false # 是否启用思考
 
 [model.replyer_1] # 首要回复模型，还用于表达器和表达方式学习
 name = "Pro/deepseek-ai/DeepSeek-V3"
@@ -256,7 +254,6 @@ provider = "SILICONFLOW"
 pri_in = 0.7
 pri_out = 2.8
 temp = 0.7
-enable_thinking = false # 是否启用思考
 
 [model.vlm] # 图像识别模型
 name = "Pro/Qwen/Qwen2.5-VL-7B-Instruct"
@@ -277,7 +274,6 @@ provider = "SILICONFLOW"
 pri_in = 0.7
 pri_out = 2.8
 temp = 0.7
-enable_thinking = false # 是否启用思考
 
 
 #嵌入模型
@@ -292,7 +288,6 @@ pri_out = 0
 [model.focus_working_memory] #工作记忆模型
 name = "Qwen/Qwen3-30B-A3B"
 provider = "SILICONFLOW"
-enable_thinking = false # 是否启用思考(qwen3 only)
 pri_in = 0.7
 pri_out = 2.8
 temp = 0.7
@@ -304,7 +299,6 @@ provider = "SILICONFLOW"
 pri_in = 0.5
 pri_out = 2
 temp = 0.7
-enable_thinking = false # 是否启用思考（qwen3 only）
 
 
 #------------LPMM知识库模型------------
@@ -331,7 +325,6 @@ provider = "SILICONFLOW"
 pri_in = 0.7
 pri_out = 2.8
 temp = 0.7
-enable_thinking = false # 是否启用思考
 
 [maim_message]
 auth_token = [] # 认证令牌，用于API验证，为空则不启用验证

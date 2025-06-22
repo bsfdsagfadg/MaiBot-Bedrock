@@ -47,7 +47,7 @@ async def generate_with_model(
         prompt: 提示词
         model_config: 模型配置（从 get_available_models 获取的模型配置）
         request_type: 请求类型标识
-        **kwargs: 其他模型特定参数，如temperature、max_tokens等
+        **kwargs: 其他模型特定参数，如temperature等
 
     Returns:
         Tuple[bool, str, str, str]: (是否成功, 生成的内容, 推理过程, 模型名称)

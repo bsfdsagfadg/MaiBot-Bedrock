@@ -38,7 +38,6 @@ class PersonalityExpression:
     def __init__(self):
         self.express_learn_model: LLMRequest = LLMRequest(
             model=global_config.model.replyer_1,
-            max_tokens=512,
             request_type="expressor.learner",
         )
         self.meta_file_path = os.path.join("data", "expression", "personality", "expression_style_meta.json")

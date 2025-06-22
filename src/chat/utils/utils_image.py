@@ -38,7 +38,7 @@ class ImageManager:
             self._ensure_image_dir()
 
             self._initialized = True
-            self._llm = LLMRequest(model=global_config.model.vlm, temperature=0.4, max_tokens=300, request_type="image")
+            self._llm = LLMRequest(model=global_config.model.vlm, temperature=0.4, request_type="image")
 
             try:
                 db.connect(reuse_if_open=True)

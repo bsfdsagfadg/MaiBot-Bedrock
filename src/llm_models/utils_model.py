@@ -122,14 +122,11 @@ class LLMRequest:
         self.model_name: str = model["name"]
         self.params = kwargs
 
-        self.enable_thinking = model.get("enable_thinking", False)
         self.temp = model.get("temp", 0.7)
-        self.thinking_budget = model.get("thinking_budget", 4096)
+        self.thinking_budget = model.get("thinking_budget", 256)
         self.stream = model.get("stream", False)
         self.pri_in = model.get("pri_in", 0)
         self.pri_out = model.get("pri_out", 0)
-        self.max_tokens = model.get("max_tokens", global_config.model.model_max_output_length)
-        # print(f"max_tokens: {self.max_tokens}")
 
         # 获取数据库实例
         self._init_database()
@@ -253,21 +250,7 @@ class LLMRequest:
         if self.temp != 0.7:
             payload["temperature"] = self.temp
 
-        # 添加enable_thinking参数（如果不是默认值False）
-        if not self.enable_thinking:
-            payload["enable_thinking"] = False
-
-        if self.thinking_budget != 4096:
-            payload["thinking_budget"] = self.thinking_budget
-
-        if self.max_tokens:
-            payload["max_tokens"] = self.max_tokens
-
-        # if "max_tokens" not in payload and "max_completion_tokens" not in payload:
-        # payload["max_tokens"] = global_config.model.model_max_output_length
-        # 如果 payload 中依然存在 max_tokens 且需要转换，在这里进行再次检查
-        if self.model_name.lower() in self.MODELS_NEEDING_TRANSFORMATION and "max_tokens" in payload:
-            payload["max_completion_tokens"] = payload.pop("max_tokens")
+        payload["thinking_budget"] = self.thinking_budget
 
         return {
             "policy": policy,
@@ -623,8 +606,7 @@ class LLMRequest:
     async def _transform_parameters(self, params: dict) -> dict:
         """
         根据模型名称转换参数：
-        - 对于需要转换的OpenAI CoT系列模型（例如 "o3-mini"），删除 'temperature' 参数，
-        并将 'max_tokens' 重命名为 'max_completion_tokens'
+        - 对于需要转换的OpenAI CoT系列模型（例如 "o3-mini"），删除 'temperature' 参数
         """
         # 复制一份参数，避免直接修改原始数据
         new_params = dict(params)
@@ -633,9 +615,6 @@ class LLMRequest:
             # 删除 'temperature' 参数（如果存在），但避免删除我们在_build_payload中添加的自定义温度
             if "temperature" in new_params and new_params["temperature"] == 0.7:
                 new_params.pop("temperature")
-            # 如果存在 'max_tokens'，则重命名为 'max_completion_tokens'
-            if "max_tokens" in new_params:
-                new_params["max_completion_tokens"] = new_params.pop("max_tokens")
         return new_params
 
     async def _build_payload(self, prompt: str, image_base64: str = None, image_format: str = None) -> dict:
@@ -668,21 +647,9 @@ class LLMRequest:
         if self.temp != 0.7:
             payload["temperature"] = self.temp
 
-        # 添加enable_thinking参数（如果不是默认值False）
-        if not self.enable_thinking:
-            payload["enable_thinking"] = False
-
         if self.thinking_budget != 4096:
             payload["thinking_budget"] = self.thinking_budget
 
-        if self.max_tokens:
-            payload["max_tokens"] = self.max_tokens
-
-        # if "max_tokens" not in payload and "max_completion_tokens" not in payload:
-        # payload["max_tokens"] = global_config.model.model_max_output_length
-        # 如果 payload 中依然存在 max_tokens 且需要转换，在这里进行再次检查
-        if self.model_name.lower() in self.MODELS_NEEDING_TRANSFORMATION and "max_tokens" in payload:
-            payload["max_completion_tokens"] = payload.pop("max_tokens")
         return payload
 
     def _default_response_handler(
@@ -739,6 +706,10 @@ class LLMRequest:
 
     async def _build_headers(self, no_key: bool = False) -> dict:
         """构建请求头"""
+        # 针对本地模型或特定服务，不发送Authorization
+        if self.base_url == "http://127.0.0.1:8889/v1beta/openai":
+            return {"Content-Type": "application/json"}
+
         if no_key:
             return {"Authorization": "Bearer **********", "Content-Type": "application/json"}
         else:
@@ -761,7 +732,7 @@ class LLMRequest:
 
     async def generate_response_async(self, prompt: str, **kwargs) -> Union[str, Tuple]:
         """异步方式根据输入的提示生成模型的响应"""
-        # 构建请求体，不硬编码max_tokens
+        # 构建请求体
         data = {
             "model": self.model_name,
             "messages": [{"role": "user", "content": prompt}],
